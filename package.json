@@ -1,0 +1,36 @@
+{
+  "name": "storage-device-info",
+  "version": "1.0.0",
+  "description": "Obtain information about storage devices",
+  "main": "index.js",
+  "directories": {
+    "example": "example"
+  },
+  "dependencies": {},
+  "contributors": [ 
+    {
+      "name": "Stephen Vickers",
+      "email": "stephen.vickers.sv@gmail.com"
+    }
+  ],
+  "repository": {
+    "type": "mercurial",
+    "url": "https://bitbucket.org/stephenwvickers/node-storage-device-info"
+  },
+  "keywords": [
+    "device",
+    "disk",
+    "disk-drive",
+    "drive",
+    "hard-disk",
+    "hard-drive",
+    "harddisk",
+    "harddrive",
+    "media",
+    "storage",
+    "storage-device",
+    "storage-media"
+  ],
+  "author": "Stephen Vickers <stephen.vickers.sv@gmail.com>",
+  "license": "MIT"
+}
