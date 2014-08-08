@@ -19,17 +19,23 @@
   },
   "keywords": [
     "device",
+    "device-space",
     "disk",
     "disk-drive",
+    "disk-space",
     "drive",
     "hard-disk",
     "hard-drive",
     "harddisk",
     "harddrive",
     "media",
+    "partition",
+    "partition-space",
+    "space",
     "storage",
     "storage-device",
-    "storage-media"
+    "storage-media",
+    "storage-space"
   ],
   "author": "Stephen Vickers <stephen.vickers.sv@gmail.com>",
   "license": "MIT"
