@@ -77,6 +77,10 @@ Bug reports should be sent to <stephen.vickers.sv@gmail.com>.
 
  * Initial release
 
+## Version 1.0.1 - 08/08/2014
+
+ * Add more keywords to the `package.json` file
+
 # Roadmap
 
 Suggestions and requirements should be sent to <stephen.vickers.sv@gmail.com>.
