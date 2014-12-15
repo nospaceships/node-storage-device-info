@@ -84,8 +84,6 @@ void DeviceInfoWrap::GetPartitionSpaceRequestBegin (uv_work_t* request) {
 	
 	info_request->rcode = 0;
 
-	DeviceInfoWrap* device_info = (DeviceInfoWrap*)info_request->device_info;
-
 #ifdef _WIN32
 	ULARGE_INTEGER total;
 	ULARGE_INTEGER free;
@@ -138,8 +136,7 @@ void DeviceInfoWrap::GetPartitionSpaceRequestEnd(uv_work_t* request, int status)
 
 			argv[1] = info;
 				
-			Local<Value> result = info_request->cb->Call(
-					info_request->device_info->handle_, 2, argv);
+			info_request->cb->Call(info_request->device_info->handle_, 2, argv);
 		}
 	}
 
