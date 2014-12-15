@@ -11,10 +11,18 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#else /* _WIN32 */
+#endif /* _WIN32 */
+
+#ifdef __APPLE__
+#include <sys/uio.h>
+#include <sys/mount.h>
+#include <errno.h>
+#endif /* __APPLE__ */
+
+#ifdef __linux__
 #include <errno.h>
 #include <sys/vfs.h>
-#endif /* _WIN32 */
+#endif /* __linux__ */
 
 #include "storage.h"
 
