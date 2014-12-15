@@ -81,6 +81,10 @@ Bug reports should be sent to <stephen.vickers.sv@gmail.com>.
 
  * Add more keywords to the `package.json` file
 
+## Version 1.0.2 - 15/12/2014
+
+ * Support MAC OS X
+
 # Roadmap
 
 Suggestions and requirements should be sent to <stephen.vickers.sv@gmail.com>.
