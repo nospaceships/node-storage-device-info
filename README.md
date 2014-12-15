@@ -85,6 +85,10 @@ Bug reports should be sent to <stephen.vickers.sv@gmail.com>.
 
  * Support MAC OS X
 
+## Version 1.0.3 - 15/12/2014
+
+ * Unused variables warnings seen during build on MAC OS X
+
 # Roadmap
 
 Suggestions and requirements should be sent to <stephen.vickers.sv@gmail.com>.
