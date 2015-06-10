@@ -3,6 +3,7 @@
 
 #include <node.h>
 #include <node_buffer.h>
+#include <nan.h>
 
 #include <string>
 
@@ -45,43 +46,42 @@ const char* drive_strerror(int code) {
 
 namespace storage {
 
+static Persistent<FunctionTemplate> DeviceInfoWrap_constructor;
+
 void InitAll(Handle<Object> target) {
-	DeviceInfoWrap::Init(target);
+	DeviceInfoWrap::Init();
+
+	Local<Function> constructor
+			= NanNew<v8::FunctionTemplate>(DeviceInfoWrap_constructor)->GetFunction();
+
+	target->Set(NanNew<String>("DeviceInfoWrap"), constructor);
 }
 
 NODE_MODULE(storage, InitAll)
 
-void DeviceInfoWrap::Init(Handle<Object> target) {
-	HandleScope scope;
-	
-	Local<FunctionTemplate> tpl = FunctionTemplate::New(New);
-	
+void DeviceInfoWrap::Init() {
+	Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>(DeviceInfoWrap::New);
+	NanAssignPersistent(DeviceInfoWrap_constructor, tpl);
+	tpl->SetClassName(NanNew("DeviceInfoWrap"));
 	tpl->InstanceTemplate()->SetInternalFieldCount(1);
-	tpl->SetClassName(String::NewSymbol("DeviceInfoWrap"));
-	
-	NODE_SET_PROTOTYPE_METHOD(tpl, "getPartitionSpace", GetPartitionSpace);
-	
-	target->Set(String::NewSymbol("DeviceInfoWrap"), tpl->GetFunction());
+
+	NODE_SET_PROTOTYPE_METHOD(tpl, "getPartitionSpace", DeviceInfoWrap::GetPartitionSpace);
 }
 
-DeviceInfoWrap::DeviceInfoWrap() {}
-
-DeviceInfoWrap::~DeviceInfoWrap() {}
-
-Handle<Value> DeviceInfoWrap::New(const Arguments& args) {
-	HandleScope scope;
+NAN_METHOD(DeviceInfoWrap::New) {
+	NanScope();
 
 	DeviceInfoWrap* device_info = new DeviceInfoWrap();
-	
+
 	device_info->Wrap(args.This());
 
-	return scope.Close(args.This());
+	NanReturnThis();
 }
 
 void DeviceInfoWrap::GetPartitionSpaceRequestBegin (uv_work_t* request) {
 	GetPartitionSpaceRequest *info_request
 			= (GetPartitionSpaceRequest*) request->data;
-	
+
 	info_request->rcode = 0;
 
 #ifdef _WIN32
@@ -108,77 +108,73 @@ void DeviceInfoWrap::GetPartitionSpaceRequestBegin (uv_work_t* request) {
 }
 
 void DeviceInfoWrap::GetPartitionSpaceRequestEnd(uv_work_t* request, int status) {
-	HandleScope scope;
+	NanScope();
+
 	GetPartitionSpaceRequest *info_request
 			= (GetPartitionSpaceRequest*) request->data;
 
 	if (status) {
 		Local<Value> argv[1];
-		argv[0] = Exception::Error(String::New(drive_strerror (
-				uv_last_error(uv_default_loop()).code)));
-		info_request->cb->Call(info_request->device_info->handle_, 1, argv);
+		argv[0] = NanError(drive_strerror(uv_last_error(uv_default_loop()).code));
+		info_request->cb->Call(1, argv);
 	} else {
 		if (info_request->rcode > 0) {
 			Local<Value> argv[1];
-			argv[0] = Exception::Error(String::New(drive_strerror(
-					info_request->rcode)));
-			info_request->cb->Call(info_request->device_info->handle_, 1, argv);
+			argv[0] = NanError(drive_strerror(info_request->rcode));
+			info_request->cb->Call(1, argv);
 		} else {
+
 			Local<Value> argv[2];
 			argv[0] = Local<Value>::New(Null());
 
 			Local<Object> info = Object::New();
 
-			info->Set(String::NewSymbol("totalMegaBytes"),
-					Integer::NewFromUnsigned(info_request->total));
-			info->Set(String::NewSymbol("freeMegaBytes"),
-					Integer::NewFromUnsigned(info_request->free));
+			info->Set(NanNew<String>("totalMegaBytes"), NanNew<Uint32>(info_request->total));
+			info->Set(NanNew<String>("freeMegaBytes"), NanNew<Uint32>(info_request->free));
 
 			argv[1] = info;
-				
-			info_request->cb->Call(info_request->device_info->handle_, 2, argv);
+
+			info_request->cb->Call(2, argv);
 		}
 	}
 
-	info_request->cb.Dispose ();
 	delete info_request;
 }
 
-Handle<Value> DeviceInfoWrap::GetPartitionSpace(const Arguments& args) {
-	HandleScope scope;
+NAN_METHOD(DeviceInfoWrap::GetPartitionSpace) {
+	NanScope();
+
 	DeviceInfoWrap* device_info = DeviceInfoWrap::Unwrap<DeviceInfoWrap>(
 			args.This());
 
 	if (args.Length() < 2) {
-		ThrowException(Exception::Error(String::New(
-				"Two arguments are required")));
-		return scope.Close(args.This());
+		NanThrowError("Two arguments are required");
+		NanReturnThis();
 	}
 
 	if (! args[0]->IsString()) {
-		ThrowException(Exception::TypeError(String::New(
-				"Path argument must be a string")));
-		return scope.Close(args.This());
+		NanThrowError("Path argument must be a string");
+		NanReturnThis();
 	}
-
-	String::AsciiValue path(args[0]);
 
 	if (! args[1]->IsFunction()) {
-		ThrowException(Exception::TypeError(String::New(
-				"Callback argument must be a function")));
-		return scope.Close(args.This());
+		NanThrowError("Callback argument must be a function");
+		NanReturnThis();
 	}
 
-	GetPartitionSpaceRequest* request = new GetPartitionSpaceRequest(*path);
+	GetPartitionSpaceRequest* request
+			= new GetPartitionSpaceRequest(*NanAsciiString(args[0]));
+
 	request->uv_request.data = (void*)request;
-	
-	request->cb = Persistent<Function>::New(Local<Function>::Cast(args[1]));
+
+	request->cb = new NanCallback(args[1].As<Function>());
+
 	request->device_info = device_info;
-	
+
 	uv_queue_work(uv_default_loop(), &request->uv_request,
 			GetPartitionSpaceRequestBegin, GetPartitionSpaceRequestEnd);
 
-	return scope.Close(args.This());
+	NanReturnThis();
 }
 
 }; /* namespace storage */
