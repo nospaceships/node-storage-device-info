@@ -97,6 +97,12 @@ Bug reports should be sent to <stephen.vickers.sv@gmail.com>.
 
  * Update two missed variable instantiations to use NanNew
 
+## Version 1.1.2 - 10/06/2015
+
+ * Do not use `uv_last_error()` as it is not available in 0.12, and do not use
+   and `uv_err_t` as the types differ between 0.10 and 0.12 due to libuv
+   changes
+
 # Roadmap
 
 Suggestions and requirements should be sent to <stephen.vickers.sv@gmail.com>.

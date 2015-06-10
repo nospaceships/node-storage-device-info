@@ -8,6 +8,7 @@
 #include <string>
 
 #include <stdarg.h>
+#include <stdio.h>
 #include <string.h>
 
 #ifdef _WIN32
@@ -115,7 +116,15 @@ void DeviceInfoWrap::GetPartitionSpaceRequestEnd(uv_work_t* request, int status)
 
 	if (status) {
 		Local<Value> argv[1];
-		argv[0] = NanError(uv_strerror(status));
+		/**
+		 ** The uv_last_error() function doesn't seem to be available in recent
+		 ** libuv versions, and the uv_err_t variable also no longer appears to
+		 ** be a structure.  This causes issues when working with both Node.js
+		 ** 0.10 and 0.12.  So, for now, we will just give you the number.
+		 **/
+		char status_str[32];
+		sprintf(status_str, "%d", status);
+		argv[0] = NanError(status_str);
 		info_request->cb->Call(1, argv);
 	} else {
 		if (info_request->rcode > 0) {
