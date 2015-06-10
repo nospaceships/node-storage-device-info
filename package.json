@@ -6,7 +6,9 @@
   "directories": {
     "example": "example"
   },
-  "dependencies": {},
+  "dependencies": {
+    "nan": "*"
+  },
   "contributors": [ 
     {
       "name": "Stephen Vickers",

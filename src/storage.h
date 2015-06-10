@@ -17,6 +17,7 @@
 #endif
 
 #include <node.h>
+#include <nan.h>
 
 #include <list>
 #include <string>
@@ -27,30 +28,35 @@ namespace storage {
 
 class DeviceInfoWrap : public node::ObjectWrap {
 public:
-	static void Init(Handle<Object> target);
+	static void Init();
 
 	static void GetPartitionSpaceRequestBegin(uv_work_t* request);
 	static void GetPartitionSpaceRequestEnd(uv_work_t* request, int status);
 
 private:
-	DeviceInfoWrap();
-	~DeviceInfoWrap();
+	DeviceInfoWrap() {};
+	~DeviceInfoWrap() {};
 
-	static Handle<Value> New(const Arguments& args);
-
-	static Handle<Value> GetPartitionSpace(const Arguments& args);
+	static NAN_METHOD(New);
+	static NAN_METHOD(GetPartitionSpace);
 };
 
 struct GetPartitionSpaceRequest {
-	GetPartitionSpaceRequest(const char *path_value) : path(path_value) {}
-	~GetPartitionSpaceRequest() {}
-	
+	GetPartitionSpaceRequest(const char *path_value) : path(path_value), cb(NULL) {}
+
+	~GetPartitionSpaceRequest() {
+		if (cb) {
+			delete cb;
+			cb = NULL;
+		}
+	}
+
 	uv_work_t uv_request;
-	
-	Persistent<Function> cb;
+
+	NanCallback *cb;
 
 	std::string path;
-	
+
 #ifdef _WIN32
 	DWORD rcode;
 #else /* _WIN32 */
