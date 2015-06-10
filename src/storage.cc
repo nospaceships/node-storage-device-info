@@ -115,7 +115,7 @@ void DeviceInfoWrap::GetPartitionSpaceRequestEnd(uv_work_t* request, int status)
 
 	if (status) {
 		Local<Value> argv[1];
-		argv[0] = NanError(drive_strerror(uv_last_error(uv_default_loop()).code));
+		argv[0] = NanError(uv_strerror(status));
 		info_request->cb->Call(1, argv);
 	} else {
 		if (info_request->rcode > 0) {
@@ -125,9 +125,9 @@ void DeviceInfoWrap::GetPartitionSpaceRequestEnd(uv_work_t* request, int status)
 		} else {
 
 			Local<Value> argv[2];
-			argv[0] = Local<Value>::New(Null());
+			argv[0] = NanNull();
 
-			Local<Object> info = Object::New();
+			Local<Object> info = NanNew<Object>();
 
 			info->Set(NanNew<String>("totalMegaBytes"), NanNew<Uint32>(info_request->total));
 			info->Set(NanNew<String>("freeMegaBytes"), NanNew<Uint32>(info_request->free));
