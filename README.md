@@ -93,6 +93,10 @@ Bug reports should be sent to <stephen.vickers.sv@gmail.com>.
 
  * Support Node.js 0.12.x using the Native Abstractions for Node interface
 
+## Version 1.1.1 - 10/06/2015
+
+ * Update two missed variable instantiations to use NanNew
+
 # Roadmap
 
 Suggestions and requirements should be sent to <stephen.vickers.sv@gmail.com>.
