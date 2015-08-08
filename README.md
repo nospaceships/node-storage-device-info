@@ -103,6 +103,11 @@ Bug reports should be sent to <stephen.vickers.sv@gmail.com>.
    and `uv_err_t` as the types differ between 0.10 and 0.12 due to libuv
    changes
 
+## Version 1.1.3 - 08/08/2015
+
+ * Add version dependency "<2.0.0" for the "nan" module to prevent build
+   failures during installation because of breaking API changes
+
 # Roadmap
 
 Suggestions and requirements should be sent to <stephen.vickers.sv@gmail.com>.
