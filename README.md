@@ -1,5 +1,5 @@
 
-# storage-device-info - [homepage][homepage]
+# storage-device-info
 
 Obtain information about storage devices.
 
@@ -25,7 +25,6 @@ Storage information can then be obtained:
        console.dir(space);
     });
 
-[homepage]: http://re-tool.org "Homepage"
 [npm]: https://npmjs.org/ "npm"
 
 # Using This Module
@@ -107,6 +106,10 @@ Bug reports should be sent to <stephen.vickers.sv@gmail.com>.
 
  * Add version dependency "<2.0.0" for the "nan" module to prevent build
    failures during installation because of breaking API changes
+
+## Version 1.1.4 - 22/09/2015
+
+ * Host repository on GitHub
 
 # Roadmap
 
