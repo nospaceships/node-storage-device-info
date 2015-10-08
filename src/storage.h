@@ -26,9 +26,9 @@ using namespace v8;
 
 namespace storage {
 
-class DeviceInfoWrap : public node::ObjectWrap {
+class DeviceInfoWrap : public Nan::ObjectWrap {
 public:
-	static void Init();
+	static void Init(Handle<Object> exports);
 
 	static void GetPartitionSpaceRequestBegin(uv_work_t* request);
 	static void GetPartitionSpaceRequestEnd(uv_work_t* request, int status);
@@ -42,7 +42,7 @@ private:
 };
 
 struct GetPartitionSpaceRequest {
-	GetPartitionSpaceRequest(const char *path_value) : path(path_value), cb(NULL) {}
+	GetPartitionSpaceRequest(const char *path_value) : cb(NULL), path(path_value) {}
 
 	~GetPartitionSpaceRequest() {
 		if (cb) {
@@ -53,7 +53,7 @@ struct GetPartitionSpaceRequest {
 
 	uv_work_t uv_request;
 
-	NanCallback *cb;
+	Nan::Callback *cb;
 
 	std::string path;
 

@@ -111,6 +111,10 @@ Bug reports should be sent to <stephen.vickers.sv@gmail.com>.
 
  * Host repository on GitHub
 
+## Version 1.2.0 - 07/10/2015
+
+ * Support Native Abstractions for Node 2.x
+
 # Roadmap
 
 Suggestions and requirements should be sent to <stephen.vickers.sv@gmail.com>.

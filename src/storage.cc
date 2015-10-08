@@ -47,36 +47,36 @@ const char* drive_strerror(int code) {
 
 namespace storage {
 
-static Persistent<FunctionTemplate> DeviceInfoWrap_constructor;
+static Nan::Persistent<FunctionTemplate> DeviceInfoWrap_constructor;
 
-void InitAll(Handle<Object> target) {
-	DeviceInfoWrap::Init();
-
-	Local<Function> constructor
-			= NanNew<v8::FunctionTemplate>(DeviceInfoWrap_constructor)->GetFunction();
-
-	target->Set(NanNew<String>("DeviceInfoWrap"), constructor);
+void InitAll(Handle<Object> exports) {
+	DeviceInfoWrap::Init(exports);
 }
 
 NODE_MODULE(storage, InitAll)
 
-void DeviceInfoWrap::Init() {
-	Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>(DeviceInfoWrap::New);
-	NanAssignPersistent(DeviceInfoWrap_constructor, tpl);
-	tpl->SetClassName(NanNew("DeviceInfoWrap"));
+void DeviceInfoWrap::Init(Handle<Object> exports) {
+	Nan::HandleScope scope;
+
+	Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>(DeviceInfoWrap::New);
+	tpl->SetClassName(Nan::New("DeviceInfoWrap").ToLocalChecked());
 	tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
-	NODE_SET_PROTOTYPE_METHOD(tpl, "getPartitionSpace", DeviceInfoWrap::GetPartitionSpace);
+	Nan::SetPrototypeMethod(tpl, "getPartitionSpace", DeviceInfoWrap::GetPartitionSpace);
+
+	DeviceInfoWrap_constructor.Reset(tpl);
+	exports->Set(Nan::New("DeviceInfoWrap").ToLocalChecked(),
+			Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 NAN_METHOD(DeviceInfoWrap::New) {
-	NanScope();
+	Nan::HandleScope scope;
 
 	DeviceInfoWrap* device_info = new DeviceInfoWrap();
 
-	device_info->Wrap(args.This());
+	device_info->Wrap(info.This());
 
-	NanReturnThis();
+	info.GetReturnValue().Set(info.This());
 }
 
 void DeviceInfoWrap::GetPartitionSpaceRequestBegin (uv_work_t* request) {
@@ -109,7 +109,7 @@ void DeviceInfoWrap::GetPartitionSpaceRequestBegin (uv_work_t* request) {
 }
 
 void DeviceInfoWrap::GetPartitionSpaceRequestEnd(uv_work_t* request, int status) {
-	NanScope();
+	Nan::HandleScope scope;
 
 	GetPartitionSpaceRequest *info_request
 			= (GetPartitionSpaceRequest*) request->data;
@@ -124,24 +124,24 @@ void DeviceInfoWrap::GetPartitionSpaceRequestEnd(uv_work_t* request, int status)
 		 **/
 		char status_str[32];
 		sprintf(status_str, "%d", status);
-		argv[0] = NanError(status_str);
+		argv[0] = Nan::Error(status_str);
 		info_request->cb->Call(1, argv);
 	} else {
 		if (info_request->rcode > 0) {
 			Local<Value> argv[1];
-			argv[0] = NanError(drive_strerror(info_request->rcode));
+			argv[0] = Nan::Error(drive_strerror(info_request->rcode));
 			info_request->cb->Call(1, argv);
 		} else {
 
 			Local<Value> argv[2];
-			argv[0] = NanNull();
+			argv[0] = Nan::Null();
 
-			Local<Object> info = NanNew<Object>();
+			Local<Object> return_info = Nan::New<Object>();
 
-			info->Set(NanNew<String>("totalMegaBytes"), NanNew<Uint32>(info_request->total));
-			info->Set(NanNew<String>("freeMegaBytes"), NanNew<Uint32>(info_request->free));
+			return_info->Set(Nan::New<String>("totalMegaBytes").ToLocalChecked(), Nan::New<Uint32>(info_request->total));
+			return_info->Set(Nan::New<String>("freeMegaBytes").ToLocalChecked(), Nan::New<Uint32>(info_request->free));
 
-			argv[1] = info;
+			argv[1] = return_info;
 
 			info_request->cb->Call(2, argv);
 		}
@@ -151,39 +151,39 @@ void DeviceInfoWrap::GetPartitionSpaceRequestEnd(uv_work_t* request, int status)
 }
 
 NAN_METHOD(DeviceInfoWrap::GetPartitionSpace) {
-	NanScope();
+	Nan::HandleScope scope;
 
 	DeviceInfoWrap* device_info = DeviceInfoWrap::Unwrap<DeviceInfoWrap>(
-			args.This());
+			info.This());
 
-	if (args.Length() < 2) {
-		NanThrowError("Two arguments are required");
-		NanReturnThis();
+	if (info.Length() < 2) {
+		Nan::ThrowError("Two arguments are required");
+		return;
 	}
 
-	if (! args[0]->IsString()) {
-		NanThrowError("Path argument must be a string");
-		NanReturnThis();
+	if (! info[0]->IsString()) {
+		Nan::ThrowError("Path argument must be a string");
+		return;
 	}
 
-	if (! args[1]->IsFunction()) {
-		NanThrowError("Callback argument must be a function");
-		NanReturnThis();
+	if (! info[1]->IsFunction()) {
+		Nan::ThrowError("Callback argument must be a function");
+		return;
 	}
 
 	GetPartitionSpaceRequest* request
-			= new GetPartitionSpaceRequest(*NanAsciiString(args[0]));
+			= new GetPartitionSpaceRequest(*Nan::Utf8String(info[0]));
 
 	request->uv_request.data = (void*)request;
 
-	request->cb = new NanCallback(args[1].As<Function>());
+	request->cb = new Nan::Callback(Local<Function>::Cast(info[1]));
 
 	request->device_info = device_info;
 
 	uv_queue_work(uv_default_loop(), &request->uv_request,
 			GetPartitionSpaceRequestBegin, GetPartitionSpaceRequestEnd);
 
-	NanReturnThis();
+	info.GetReturnValue().Set(info.This());
 }
 
 }; /* namespace storage */
