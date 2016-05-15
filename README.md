@@ -115,6 +115,10 @@ Bug reports should be sent to <stephen.vickers.sv@gmail.com>.
 
  * Support Native Abstractions for Node 2.x
 
+## Version 1.3.0 - 15/05/2015
+
+ * Require nan 2.3.x to support node version 6
+
 # Roadmap
 
 Suggestions and requirements should be sent to <stephen.vickers.sv@gmail.com>.
