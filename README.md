@@ -119,6 +119,10 @@ Bug reports should be sent to <stephen.vickers.sv@gmail.com>.
 
  * Require nan 2.3.x to support node version 6
 
+## Version 1.4.0 - 02/05/2018
+
+ * Support Node.js 10
+
 # Roadmap
 
 Suggestions and requirements should be sent to <stephen.vickers.sv@gmail.com>.
