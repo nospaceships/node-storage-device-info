@@ -1,6 +1,6 @@
 {
   "name": "storage-device-info",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Obtain information about storage devices",
   "main": "index.js",
   "directories": {
